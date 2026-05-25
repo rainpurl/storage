@@ -16,6 +16,7 @@ Response rules:
 - If nothing matches, say so honestly. Suggest related items if any are present.
 - Treat each box's description as additional context — items mentioned in the description count as being in that box.
 - Be brief and conversational. Never dump the whole inventory.
+- If user asks a question that is not related to the storage unit or asking where an item is, return the verbatim response: "Please don't waste my tokens with unrelated questions. Ask about the storage."
 - Never invent item names. If the inventory is empty, say so.`;
 
 export async function onRequestPost(context) {
@@ -86,12 +87,7 @@ export async function onRequestOptions() {
 function formatInventory(boxes) {
   const values = Object.values(boxes || {});
   if (values.length === 0) return '(no boxes in inventory yet)';
-  values.sort((a, b) => {
-    const an = parseInt(a.id, 10);
-    const bn = parseInt(b.id, 10);
-    if (!isNaN(an) && !isNaN(bn)) return an - bn || String(a.id).localeCompare(String(b.id));
-    return String(a.id).localeCompare(String(b.id), undefined, { numeric: true });
-  });
+  values.sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
   return values.map((b) => {
     const head = `Box ${b.id}${b.label ? ' — "' + b.label + '"' : ''}${b.description ? ' [' + b.description + ']' : ''}`;
     const items = (b.items || [])
