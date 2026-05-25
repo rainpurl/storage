@@ -232,18 +232,18 @@
     .box-number {
       font-size: clamp(38px, 13vw, 60px);
       font-weight: 900;
-      color: rgba(0,0,0,0.55);
+      color: var(--box-text, rgba(0,0,0,0.55));
       line-height: 0.9;
       letter-spacing: -0.04em;
       font-feature-settings: "ss01";
-      text-shadow: 0 1px 0 rgba(255,255,255,0.12);
+      text-shadow: 0 1px 0 rgba(255,255,255,0.08);
     }
     .box-label {
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: rgba(0,0,0,0.72);
+      color: var(--box-text-strong, rgba(0,0,0,0.72));
       margin-top: 8px;
       max-width: 100%;
       overflow: hidden;
@@ -254,7 +254,7 @@
     .box-count {
       font-size: 9px;
       font-weight: 600;
-      color: rgba(0,0,0,0.5);
+      color: var(--box-text-soft, rgba(0,0,0,0.48));
       margin-top: 6px;
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -418,7 +418,6 @@
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 20px;
-      color: rgba(0,0,0,0.85);
       position: relative;
       overflow: hidden;
       box-shadow:
@@ -438,7 +437,7 @@
       letter-spacing: 0.18em;
       text-transform: uppercase;
       font-weight: 700;
-      color: rgba(0,0,0,0.55);
+      color: var(--box-text-soft, rgba(0,0,0,0.55));
       margin-bottom: 4px;
     }
     .box-hero-num {
@@ -446,18 +445,19 @@
       font-weight: 900;
       line-height: 0.9;
       letter-spacing: -0.04em;
-      color: rgba(0,0,0,0.78);
+      color: var(--box-text-strong, rgba(0,0,0,0.78));
     }
     .box-hero-label {
       font-size: 22px;
       font-weight: 800;
       margin-top: 14px;
       line-height: 1.15;
+      color: var(--box-text-strong, rgba(0,0,0,0.85));
     }
     .box-hero-desc {
       font-size: 14px;
       font-weight: 500;
-      color: rgba(0,0,0,0.65);
+      color: var(--box-text, rgba(0,0,0,0.65));
       margin-top: 6px;
       line-height: 1.4;
     }
@@ -498,12 +498,12 @@
 
     .color-picker {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
     }
     .swatch {
       aspect-ratio: 1;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 2px solid transparent;
       cursor: pointer;
       padding: 0;
@@ -517,9 +517,46 @@
       content: '';
       position: absolute;
       inset: 0;
-      border-radius: 4px;
+      border-radius: 6px;
       box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2);
+      pointer-events: none;
     }
+    .swatch-clear {
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+    }
+    .swatch-custom::after {
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4);
+    }
+
+    .hex-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 0 12px;
+      background: var(--paper-2);
+      border: 1px solid var(--line-soft);
+      border-radius: 6px;
+    }
+    .hex-prefix {
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      font-size: 15px;
+      color: var(--ink-mute);
+      font-weight: 600;
+    }
+    .hex-input {
+      flex: 1;
+      padding: 10px 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+      text-transform: lowercase;
+    }
+    .hex-input::placeholder { color: var(--ink-mute); letter-spacing: 0.08em; }
 
     /* Items list */
     .items-section {
@@ -870,6 +907,33 @@
       to { transform: translate(-50%, 0); opacity: 1; }
     }
 
+    /* Sync status pill */
+    .sync-pill {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 60;
+      padding: 6px 12px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      animation: pill-in 0.18s ease-out;
+    }
+    .sync-pill[data-status="error"] {
+      background: var(--danger);
+      color: white;
+      border-color: var(--danger);
+    }
+    @keyframes pill-in {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     @media (min-width: 600px) {
       .grid { grid-template-columns: 1fr 1fr 1fr; }
     }
@@ -886,16 +950,65 @@
     // ============ Config ============
     const STORAGE_KEY = 'storage-locker-v2';
 
-    // Box color presets — all cardboard shades
+    // Box color presets
     const BOX_COLORS = {
-      brown:    { main: '#a8794a', light: '#c39564', dark: '#7d572f', name: 'Brown' },
-      tan:      { main: '#c89e6a', light: '#ddb784', dark: '#9c7548', name: 'Tan' },
-      kraft:    { main: '#8b6234', light: '#a47843', dark: '#5d4020', name: 'Kraft' },
-      sand:     { main: '#d4b88f', light: '#e5cba6', dark: '#a88e6a', name: 'Sand' },
-      espresso: { main: '#5d4527', light: '#7a5d3a', dark: '#3d2c18', name: 'Espresso' },
-      rust:     { main: '#a85535', light: '#bf6c4a', dark: '#7d3d22', name: 'Rust' },
+      brown: { main: '#a8794a', light: '#c39564', dark: '#7d572f', textLight: false, name: 'Brown' },
+      black: { main: '#2a2a2a', light: '#444444', dark: '#0f0f0f', textLight: true,  name: 'Black' },
+      clear: { main: '#cdd6da', light: '#e2e9ec', dark: '#9aa6ac', textLight: false, name: 'Clear' },
     };
     const DEFAULT_COLOR = 'brown';
+    const DEFAULT_CUSTOM_HEX = '#a8794a';
+
+    // ============ Color helpers ============
+    function hexToRgb(hex) {
+      if (!hex) return null;
+      const c = hex.replace('#', '').trim();
+      const full = c.length === 3 ? c.split('').map(x => x + x).join('') : c;
+      if (!/^[0-9a-fA-F]{6}$/.test(full)) return null;
+      const n = parseInt(full, 16);
+      return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+    }
+    function rgbToHex({ r, g, b }) {
+      const h = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+      return '#' + h(r) + h(g) + h(b);
+    }
+    function adjust({ r, g, b }, amount) {
+      if (amount >= 0) return { r: r + (255 - r) * amount, g: g + (255 - g) * amount, b: b + (255 - b) * amount };
+      return { r: r * (1 + amount), g: g * (1 + amount), b: b * (1 + amount) };
+    }
+    function isHexLight(hex) {
+      const rgb = hexToRgb(hex);
+      if (!rgb) return true;
+      return (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255 > 0.55;
+    }
+    function variantsFromHex(hex) {
+      const rgb = hexToRgb(hex);
+      if (!rgb) return null;
+      return {
+        main: rgbToHex(rgb),
+        light: rgbToHex(adjust(rgb, 0.18)),
+        dark: rgbToHex(adjust(rgb, -0.28)),
+        textLight: !isHexLight(hex),
+        name: 'Custom',
+      };
+    }
+    function getBoxColors(box) {
+      if (box.color === 'custom' && box.customHex) {
+        const v = variantsFromHex(box.customHex);
+        if (v) return v;
+      }
+      return BOX_COLORS[box.color] || BOX_COLORS[DEFAULT_COLOR];
+    }
+    function boxStyleVars(c) {
+      return {
+        '--box': c.main,
+        '--box-light': c.light,
+        '--box-dark': c.dark,
+        '--box-text': c.textLight ? 'rgba(255,255,255,0.78)' : 'rgba(0,0,0,0.55)',
+        '--box-text-strong': c.textLight ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.72)',
+        '--box-text-soft': c.textLight ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.48)',
+      };
+    }
 
     // ============ Cloud API ============
     async function fetchInventory() {
@@ -1050,7 +1163,7 @@
       };
 
       // ---- CRUD ----
-      const addBox = (id, label, description, color) => {
+      const addBox = (id, label, description, color, customHex) => {
         const trimId = String(id).trim();
         if (!trimId) return { ok: false, error: 'Box number required' };
         if (boxes[trimId]) return { ok: false, error: `Box ${trimId} already exists` };
@@ -1061,6 +1174,7 @@
             label: (label || '').trim(),
             description: (description || '').trim(),
             color: color || DEFAULT_COLOR,
+            customHex: customHex || '',
             items: [],
             created: Date.now(),
           }
@@ -1138,10 +1252,7 @@
       // ---- Derived ----
       const sortedBoxes = useMemo(() => {
         return Object.values(boxes).sort((a, b) => {
-          const an = parseInt(a.id, 10);
-          const bn = parseInt(b.id, 10);
-          if (!isNaN(an) && !isNaN(bn)) return an - bn || a.id.localeCompare(b.id);
-          return a.id.localeCompare(b.id, undefined, { numeric: true });
+          return parseInt(a.id, 10) - parseInt(b.id, 10);
         });
       }, [boxes]);
 
@@ -1190,6 +1301,12 @@
 
       return (
         <>
+          {syncStatus !== 'idle' && (
+            <div className="sync-pill" data-status={syncStatus}>
+              {syncStatus === 'saving' ? 'Saving…' : 'Sync error'}
+            </div>
+          )}
+
           {isEditMode && (
             <div className="edit-banner">
               Editing — tap pencil to finish
@@ -1199,15 +1316,10 @@
           {view === 'home' && (
             <HomeView
               boxes={sortedBoxes}
-              totalItems={totalItems}
-              search={search}
-              setSearch={setSearch}
-              searchResults={searchResults}
               isEditMode={isEditMode}
-              syncStatus={syncStatus}
               onSelectBox={(id) => navigate('box', id)}
               onAddBox={(data) => {
-                const result = addBox(data.id, data.label, data.description, data.color);
+                const result = addBox(data.id, data.label, data.description, data.color, data.customHex);
                 if (result.ok) {
                   showToast(`Box ${data.id} created`);
                   navigate('box', data.id);
@@ -1264,87 +1376,35 @@
     }
 
     // ============ Home View ============
-    function HomeView({ boxes, totalItems, search, setSearch, searchResults, isEditMode, syncStatus, onSelectBox, onAddBox, onDeleteBox }) {
+    function HomeView({ boxes, isEditMode, onSelectBox, onAddBox, onDeleteBox }) {
       const [showNewBox, setShowNewBox] = useState(false);
       const [confirmDelete, setConfirmDelete] = useState(null);
 
       return (
         <>
-          <div className="header">
-            <h1>STORAGE</h1>
-            <div className="sub">Studio Katresai</div>
-            <div className="header-stats">
-              <div><span className="num">{boxes.length}</span> boxes</div>
-              <div>·</div>
-              <div><span className="num">{totalItems}</span> items</div>
-              {syncStatus === 'saving' && (
-                <><div>·</div><div style={{color:'var(--accent-deep)'}}>saving…</div></>
-              )}
-              {syncStatus === 'error' && (
-                <><div>·</div><div style={{color:'var(--danger)'}}>sync error</div></>
-              )}
-            </div>
-          </div>
-
-          <div className="search-wrap">
-            <Icon name="search" size={18} className="search-icon" />
-            <input
-              className="search-input"
-              type="search"
-              placeholder="Search items or boxes…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              autoComplete="off"
-            />
-            {search && (
-              <button className="search-clear" onClick={() => setSearch('')} aria-label="Clear">
-                <Icon name="close" size={16} />
-              </button>
+          <div className="shelf-section" style={{paddingTop: 24}}>
+            {boxes.length === 0 && !isEditMode ? (
+              <Empty />
+            ) : (
+              <div className="grid">
+                {boxes.map(box => (
+                  <BoxTile
+                    key={box.id}
+                    box={box}
+                    isEditMode={isEditMode}
+                    onClick={() => onSelectBox(box.id)}
+                    onDelete={() => setConfirmDelete(box)}
+                  />
+                ))}
+                {isEditMode && (
+                  <button className="new-box-tile" onClick={() => setShowNewBox(true)}>
+                    <Icon name="plus" size={28} />
+                    <span>New box</span>
+                  </button>
+                )}
+              </div>
             )}
           </div>
-
-          {searchResults ? (
-            <div className="results">
-              <div className="section-label">
-                {searchResults.length === 0
-                  ? `No matches for "${search}"`
-                  : `${searchResults.length} ${searchResults.length === 1 ? 'box' : 'boxes'} match`}
-              </div>
-              {searchResults.map(({ box, matched }) => (
-                <SearchResultCard
-                  key={box.id}
-                  box={box}
-                  matched={matched}
-                  query={search}
-                  onClick={() => onSelectBox(box.id)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="shelf-section">
-              {boxes.length === 0 && !isEditMode ? (
-                <Empty onAdd={() => setShowNewBox(true)} />
-              ) : (
-                <div className="grid">
-                  {boxes.map(box => (
-                    <BoxTile
-                      key={box.id}
-                      box={box}
-                      isEditMode={isEditMode}
-                      onClick={() => onSelectBox(box.id)}
-                      onDelete={() => setConfirmDelete(box)}
-                    />
-                  ))}
-                  {isEditMode && (
-                    <button className="new-box-tile" onClick={() => setShowNewBox(true)}>
-                      <Icon name="plus" size={28} />
-                      <span>New box</span>
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
 
           {showNewBox && (
             <NewBoxModal
@@ -1376,17 +1436,14 @@
 
     // ============ Box Tile (cardboard box visual) ============
     function BoxTile({ box, isEditMode, onClick, onDelete }) {
-      const c = BOX_COLORS[box.color] || BOX_COLORS[DEFAULT_COLOR];
-      const style = {
-        '--box': c.main,
-        '--box-light': c.light,
-        '--box-dark': c.dark,
-      };
+      const c = getBoxColors(box);
+      const style = boxStyleVars(c);
+      const showTape = box.color !== 'clear';
       return (
         <div style={{ position: 'relative' }}>
           <button className="box" style={style} onClick={onClick}>
             <div className="box-flap"></div>
-            <div className="box-tape"></div>
+            {showTape && <div className="box-tape"></div>}
             <div className="box-shading"></div>
             <div className="box-content">
               <div className="box-number">{box.id}</div>
@@ -1433,7 +1490,7 @@
     }
 
     // ============ Empty State ============
-    function Empty({ onAdd }) {
+    function Empty() {
       return (
         <div className="empty">
           <div className="big-box">📦</div>
@@ -1449,16 +1506,11 @@
       const [confirmDeleteItem, setConfirmDeleteItem] = useState(null);
       const [editingItemId, setEditingItemId] = useState(null);
 
-      const c = BOX_COLORS[box.color] || BOX_COLORS[DEFAULT_COLOR];
+      const c = getBoxColors(box);
 
       return (
         <div className="box-view">
-          <div className="box-hero" style={{
-            '--box': c.main,
-            '--box-light': c.light,
-            '--box-dark': c.dark,
-            background: c.main,
-          }}>
+          <div className="box-hero" style={boxStyleVars(c)}>
             <div className="box-hero-num-lbl">BOX №</div>
             <div className="box-hero-num">{box.id}</div>
             {box.label && <div className="box-hero-label">{box.label}</div>}
@@ -1578,17 +1630,15 @@
           </div>
           <div className="field">
             <label className="field-label">Box color</label>
-            <div className="color-picker">
-              {Object.entries(BOX_COLORS).map(([key, c]) => (
-                <button
-                  key={key}
-                  className={`swatch ${box.color === key ? 'active' : ''}`}
-                  style={{ background: c.main }}
-                  onClick={() => onUpdate({ color: key })}
-                  aria-label={c.name}
-                />
-              ))}
-            </div>
+            <ColorPicker
+              color={box.color}
+              customHex={box.customHex}
+              onChange={(newColor, newHex) => {
+                const updates = { color: newColor };
+                if (newColor === 'custom') updates.customHex = newHex || DEFAULT_CUSTOM_HEX;
+                onUpdate(updates);
+              }}
+            />
           </div>
         </div>
       );
@@ -1861,11 +1911,85 @@
       );
     }
 
+    // ============ Color Picker (presets + custom hex) ============
+    function ColorPicker({ color, customHex, onChange }) {
+      const initialHex = (customHex || DEFAULT_CUSTOM_HEX).replace('#', '');
+      const [localHex, setLocalHex] = useState(initialHex);
+      const hexTimer = useRef();
+
+      useEffect(() => {
+        setLocalHex((customHex || DEFAULT_CUSTOM_HEX).replace('#', ''));
+      }, [customHex]);
+
+      const pickPreset = (key) => {
+        if (key === 'custom') {
+          onChange('custom', customHex || DEFAULT_CUSTOM_HEX);
+        } else {
+          onChange(key, customHex || '');
+        }
+      };
+
+      const handleHexInput = (raw) => {
+        const clean = raw.replace(/[^0-9a-fA-F]/g, '').slice(0, 6);
+        setLocalHex(clean);
+        clearTimeout(hexTimer.current);
+        if (clean.length === 6) {
+          hexTimer.current = setTimeout(() => onChange('custom', '#' + clean), 250);
+        }
+      };
+
+      const customSwatchStyle = color === 'custom' && customHex
+        ? { background: customHex }
+        : { background: 'conic-gradient(from 210deg, #ff6b6b, #feca57, #6bcb77, #4d96ff, #c780fa, #ff6b6b)' };
+
+      return (
+        <div>
+          <div className="color-picker">
+            {Object.entries(BOX_COLORS).map(([key, c]) => (
+              <button
+                key={key}
+                type="button"
+                className={`swatch swatch-${key} ${color === key ? 'active' : ''}`}
+                style={{ background: c.main }}
+                onClick={() => pickPreset(key)}
+                aria-label={c.name}
+                title={c.name}
+              />
+            ))}
+            <button
+              type="button"
+              className={`swatch swatch-custom ${color === 'custom' ? 'active' : ''}`}
+              style={customSwatchStyle}
+              onClick={() => pickPreset('custom')}
+              aria-label="Custom color"
+              title="Custom"
+            />
+          </div>
+          {color === 'custom' && (
+            <div className="hex-row">
+              <span className="hex-prefix">#</span>
+              <input
+                className="hex-input"
+                value={localHex}
+                onChange={(e) => handleHexInput(e.target.value)}
+                placeholder="a8794a"
+                maxLength={6}
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+              />
+            </div>
+          )}
+        </div>
+      );
+    }
+
     function NewBoxModal({ existingIds, onCancel, onCreate }) {
       const [id, setId] = useState('');
       const [label, setLabel] = useState('');
       const [description, setDescription] = useState('');
       const [color, setColor] = useState(DEFAULT_COLOR);
+      const [customHex, setCustomHex] = useState(DEFAULT_CUSTOM_HEX);
       const [error, setError] = useState('');
       const inputRef = useRef(null);
 
@@ -1874,8 +1998,16 @@
       const submit = () => {
         const trim = id.trim();
         if (!trim) { setError('Box number required'); return; }
-        if (existingIds.has(trim)) { setError(`Box ${trim} already exists`); return; }
-        onCreate({ id: trim, label, description, color });
+        if (!/^\d+$/.test(trim)) { setError('Numbers only'); return; }
+        const normalized = String(parseInt(trim, 10));
+        if (existingIds.has(normalized)) { setError(`Box ${normalized} already exists`); return; }
+        onCreate({
+          id: normalized,
+          label,
+          description,
+          color,
+          customHex: color === 'custom' ? customHex : '',
+        });
       };
 
       return (
@@ -1886,8 +2018,10 @@
             <div className="field">
               <label className="field-label">Box number</label>
               <input ref={inputRef} className="input" value={id}
-                onChange={(e) => { setId(e.target.value); setError(''); }}
-                placeholder="e.g. 1, 12, A3" />
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onChange={(e) => { setId(e.target.value.replace(/[^0-9]/g, '')); setError(''); }}
+                placeholder="e.g. 1, 12, 25" />
             </div>
             <div className="field">
               <label className="field-label">Label (optional)</label>
@@ -1899,12 +2033,14 @@
             </div>
             <div className="field">
               <label className="field-label">Color</label>
-              <div className="color-picker">
-                {Object.entries(BOX_COLORS).map(([key, c]) => (
-                  <button key={key} className={`swatch ${color === key ? 'active' : ''}`}
-                    style={{ background: c.main }} onClick={() => setColor(key)} aria-label={c.name} />
-                ))}
-              </div>
+              <ColorPicker
+                color={color}
+                customHex={customHex}
+                onChange={(newColor, newHex) => {
+                  setColor(newColor);
+                  if (newHex) setCustomHex(newHex);
+                }}
+              />
             </div>
             {error && <div className="field-error">{error}</div>}
             <div className="modal-actions">
