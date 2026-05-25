@@ -54,7 +54,7 @@
     }
 
     body {
-      padding-bottom: calc(76px + env(safe-area-inset-bottom));
+      padding-bottom: calc(100px + env(safe-area-inset-bottom));
       max-width: 720px;
       margin: 0 auto;
     }
@@ -765,7 +765,7 @@
 
     .ask-input-bar {
       position: sticky;
-      bottom: calc(76px + env(safe-area-inset-bottom));
+      bottom: calc(100px + env(safe-area-inset-bottom));
       background: var(--bg);
       padding: 10px 0;
       display: flex;
@@ -805,45 +805,59 @@
     .ask-send:disabled { opacity: 0.4; }
     .ask-send:active:not(:disabled) { transform: scale(0.92); }
 
-    /* ============ Bottom Nav ============ */
+    /* ============ Bottom Nav (floating pill) ============ */
     .bottom-nav {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--nav-bg);
-      background-image: linear-gradient(180deg, var(--nav-bg-2) 0%, var(--nav-bg) 100%);
-      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-      z-index: 30;
-      box-shadow: 0 -3px 12px rgba(0,0,0,0.25);
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, var(--nav-bg-2) 0%, var(--nav-bg) 100%);
+      padding: 6px;
+      border-radius: 999px;
+      box-shadow:
+        0 8px 24px rgba(0,0,0,0.28),
+        0 2px 6px rgba(0,0,0,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.08);
       display: flex;
-      justify-content: center;
       align-items: center;
-      gap: 28px;
-      max-width: 720px;
-      margin: 0 auto;
+      z-index: 30;
     }
     .nav-btn {
       background: transparent;
       border: none;
       color: var(--nav-fg);
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 3px;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      justify-content: center;
       cursor: pointer;
-      padding: 6px 14px;
-      border-radius: 10px;
-      min-width: 64px;
-      opacity: 0.85;
+      width: 52px;
+      height: 52px;
+      margin: 0 2px;
+      border-radius: 50%;
+      opacity: 0.65;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition:
+        width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+        margin 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.22s ease,
+        color 0.18s ease,
+        background 0.15s ease,
+        transform 0.12s ease;
     }
-    .nav-btn:active { background: rgba(255,255,255,0.1); }
-    .nav-btn.active { color: var(--nav-active); opacity: 1; }
-    .nav-btn.hidden { visibility: hidden; pointer-events: none; }
+    .nav-btn:active { background: rgba(255,255,255,0.12); transform: scale(0.94); }
+    .nav-btn.active {
+      color: var(--nav-active);
+      opacity: 1;
+      background: rgba(255,255,255,0.08);
+    }
+    .nav-btn.collapsed {
+      width: 0;
+      margin-left: 0;
+      margin-right: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
 
     /* ============ Modal ============ */
     .modal-backdrop {
@@ -892,7 +906,7 @@
     /* Toast */
     .toast {
       position: fixed;
-      bottom: calc(96px + env(safe-area-inset-bottom));
+      bottom: calc(110px + env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
       background: var(--ink);
@@ -2086,19 +2100,28 @@
       const showBack = view !== 'home';
       return (
         <nav className="bottom-nav">
-          {showBack && (
-            <button className="nav-btn" onClick={onBack} aria-label="Home">
-              <Icon name="back" size={22} />
-              <span>Back</span>
-            </button>
-          )}
-          <button className={`nav-btn ${view === 'ask' ? 'active' : ''}`} onClick={onAsk} aria-label="Ask AI">
-            <Icon name="sparkle" size={22} />
-            <span>Ask</span>
+          <button
+            className={`nav-btn ${!showBack ? 'collapsed' : ''}`}
+            onClick={onBack}
+            aria-label="Home"
+            aria-hidden={!showBack}
+            tabIndex={showBack ? 0 : -1}
+          >
+            <Icon name="back" size={22} />
           </button>
-          <button className={`nav-btn ${isEditMode ? 'active' : ''}`} onClick={onEdit} aria-label="Edit">
-            <Icon name="pencil" size={22} />
-            <span>{isEditMode ? 'Done' : 'Edit'}</span>
+          <button
+            className={`nav-btn ${view === 'ask' ? 'active' : ''}`}
+            onClick={onAsk}
+            aria-label="Ask AI"
+          >
+            <Icon name="sparkle" size={22} />
+          </button>
+          <button
+            className={`nav-btn ${isEditMode ? 'active' : ''}`}
+            onClick={onEdit}
+            aria-label={isEditMode ? 'Done editing' : 'Edit'}
+          >
+            <Icon name={isEditMode ? 'check2' : 'pencil'} size={22} />
           </button>
         </nav>
       );
