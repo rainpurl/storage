@@ -38,6 +38,11 @@
       --box-dark: #7d572f;
     }
 
+    :root {
+      --tex-wood: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 60' preserveAspectRatio='none'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.018 0.95' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10  0 0 0 0 0.06  0 0 0 0 0.02  0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='600' height='60' filter='url(%23w)'/%3E%3C/svg%3E");
+      --tex-wood-vert: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 300' preserveAspectRatio='none'%3E%3Cfilter id='wv'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.85 0.018' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.10  0 0 0 0 0.06  0 0 0 0 0.02  0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='40' height='300' filter='url(%23wv)'/%3E%3C/svg%3E");
+      --tex-cardboard: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1 0.7' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.22  0 0 0 0 0.15  0 0 0 0 0.07  0 0 0 0.2 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23c)'/%3E%3C/svg%3E");
+    }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     html, body {
@@ -152,67 +157,82 @@
 
     /* ============ Shelves ============ */
     .shelves {
+      position: relative;
       margin: 0 -16px;
-      padding-top: 24px;
+      padding: 28px 16px 8px;
+      isolation: isolate;
     }
+    /* Left & right uprights — the vertical sides of the unit */
+    .shelves::before,
+    .shelves::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 16px;
+      background:
+        var(--tex-wood-vert) center / 100% 300px repeat-y,
+        linear-gradient(90deg,
+          #20140a 0%,
+          #4a3018 25%,
+          #6b4727 50%,
+          #4a3018 75%,
+          #20140a 100%);
+      background-blend-mode: multiply;
+      box-shadow:
+        inset 1px 0 0 rgba(255,210,170,0.12),
+        inset -1px 0 0 rgba(0,0,0,0.5),
+        2px 0 4px rgba(0,0,0,0.18);
+      z-index: 0;
+    }
+    .shelves::before { left: 0; border-radius: 1px 0 0 1px; }
+    .shelves::after  { right: 0; box-shadow: inset -1px 0 0 rgba(255,210,170,0.12), inset 1px 0 0 rgba(0,0,0,0.5), -2px 0 4px rgba(0,0,0,0.18); border-radius: 0 1px 1px 0; }
+
     .shelf {
       position: relative;
-      margin-bottom: 28px;
+      margin-bottom: 30px;
+      z-index: 1;
     }
     .shelf-items {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      padding: 0 18px;
+      gap: 18px;
+      padding: 0 6px;
       align-items: end;
       position: relative;
       z-index: 2;
     }
     .shelf-spacer { visibility: hidden; }
 
-    /* The wooden shelf board */
+    /* The wooden shelf board — visibly thick, real grain, lit from above */
     .shelf-board {
-      height: 18px;
+      height: 22px;
       position: relative;
+      margin: 0 -2px;
       background:
+        var(--tex-wood) top left / 600px 22px repeat-x,
         linear-gradient(180deg,
-          #9c7045 0%,
-          #7d5733 35%,
-          #5d4022 75%,
-          #3d2814 100%);
+          #b88350 0%,
+          #9c6938 8%,
+          #7d4f26 35%,
+          #5d3717 75%,
+          #2e1a08 100%);
+      background-blend-mode: multiply;
       box-shadow:
-        inset 0 1px 0 rgba(255, 220, 180, 0.22),
-        inset 0 -2px 0 rgba(0,0,0,0.4),
-        0 10px 14px -6px rgba(0,0,0,0.35),
-        0 3px 6px -2px rgba(0,0,0,0.18);
+        inset 0 1px 0 rgba(255, 225, 185, 0.32),
+        inset 0 -1px 0 rgba(0,0,0,0.5),
+        0 12px 14px -6px rgba(0,0,0,0.4),
+        0 4px 6px -2px rgba(0,0,0,0.22);
     }
-    /* Subtle wood grain */
-    .shelf-board::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        repeating-linear-gradient(180deg,
-          transparent 0,
-          rgba(0,0,0,0.05) 2px,
-          transparent 4px,
-          transparent 8px),
-        repeating-linear-gradient(90deg,
-          transparent 0,
-          rgba(255,255,255,0.025) 40px,
-          transparent 80px,
-          transparent 160px);
-      pointer-events: none;
-    }
-    /* Front lip — the thickness of the shelf */
+    /* Front lip — soft shadow under the shelf */
     .shelf-board::after {
       content: '';
       position: absolute;
       left: 0;
       right: 0;
       top: 100%;
-      height: 5px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.22), transparent);
+      height: 8px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.32), transparent 70%);
       pointer-events: none;
     }
 
@@ -221,7 +241,10 @@
       display: block;
       width: 100%;
       aspect-ratio: 1 / 1.08;
-      background: var(--box);
+      background:
+        var(--tex-cardboard) center / 220px 220px,
+        var(--box);
+      background-blend-mode: multiply;
       border-radius: 3px 3px 4px 4px;
       position: relative;
       overflow: hidden;
@@ -231,15 +254,23 @@
       font-family: inherit;
       transition: transform 0.12s ease;
       box-shadow:
-        0 10px 12px -6px rgba(0,0,0,0.42),
-        0 4px 6px -2px rgba(0,0,0,0.22),
-        inset 0 -3px 0 rgba(0,0,0,0.14);
+        0 12px 14px -6px rgba(0,0,0,0.5),
+        0 5px 7px -2px rgba(0,0,0,0.28),
+        inset 0 -3px 0 rgba(0,0,0,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.06);
     }
     .box:active {
       transform: translateY(2px);
       box-shadow:
-        0 5px 8px -4px rgba(0,0,0,0.4),
+        0 6px 8px -4px rgba(0,0,0,0.45),
         0 2px 3px -1px rgba(0,0,0,0.2);
+    }
+    /* Boxes with no cardboard pattern (clear plastic bins) */
+    .box[data-color="clear"] {
+      background: var(--box);
+    }
+    .box[data-color="clear"] .box-flap {
+      background: linear-gradient(180deg, var(--box-dark) 0%, var(--box) 100%);
     }
 
     /* Top flap area */
@@ -247,29 +278,65 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 24%;
-      background: linear-gradient(180deg, var(--box-dark) 0%, var(--box) 100%);
-      border-bottom: 1px solid rgba(0,0,0,0.3);
+      background:
+        var(--tex-cardboard) center / 220px 220px,
+        linear-gradient(180deg, var(--box-dark) 0%, var(--box) 100%);
+      background-blend-mode: multiply;
+      border-bottom: 1px solid rgba(0,0,0,0.35);
+      box-shadow: inset 0 -2px 4px rgba(0,0,0,0.18);
     }
-    /* Tape across flap */
+    /* Vertical seam where the two flaps meet */
+    .box-flap::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      border-left: 1px solid rgba(0,0,0,0.45);
+      box-shadow: 1px 0 0 rgba(255,255,255,0.08);
+      transform: translateX(-0.5px);
+    }
+    /* Packing tape across the seam */
     .box-tape {
       position: absolute;
       top: 9%;
-      left: 0; right: 0;
-      height: 9%;
-      background: linear-gradient(180deg, rgba(245,230,200,0.55), rgba(235,220,185,0.45));
-      border-top: 1px solid rgba(0,0,0,0.1);
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-      box-shadow: inset 0 0 4px rgba(0,0,0,0.04);
+      left: -2%;
+      right: -2%;
+      height: 10%;
+      background: linear-gradient(180deg,
+        rgba(228, 208, 168, 0.7) 0%,
+        rgba(208, 188, 148, 0.78) 35%,
+        rgba(195, 175, 135, 0.78) 65%,
+        rgba(180, 160, 120, 0.7) 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 245, 220, 0.55),
+        inset 0 -1px 0 rgba(70, 50, 25, 0.3),
+        0 1px 1px rgba(0,0,0,0.12);
     }
-    /* Side shading & bottom edge */
+    /* Subtle shine highlight on tape */
+    .box-tape::after {
+      content: '';
+      position: absolute;
+      top: 25%;
+      bottom: 25%;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg,
+        rgba(255,255,255,0.18) 0%,
+        rgba(255,255,255,0.04) 100%);
+      pointer-events: none;
+    }
+    /* Side shading & bottom edge — gives the box dimension */
     .box-shading {
       position: absolute;
       inset: 0;
       pointer-events: none;
       box-shadow:
-        inset 5px 0 10px rgba(0,0,0,0.06),
-        inset -5px 0 10px rgba(0,0,0,0.06),
-        inset 0 -4px 0 var(--box-dark);
+        inset 6px 0 14px -4px rgba(0,0,0,0.18),
+        inset -6px 0 14px -4px rgba(0,0,0,0.18),
+        inset 0 -4px 0 var(--box-dark),
+        inset 0 -10px 14px -6px rgba(0,0,0,0.25);
       border-radius: inherit;
     }
 
@@ -1531,7 +1598,7 @@
       const showTape = box.color !== 'clear';
       return (
         <div style={{ position: 'relative' }}>
-          <button className="box" style={style} onClick={onClick}>
+          <button className="box" data-color={box.color} style={style} onClick={onClick}>
             <div className="box-flap"></div>
             {showTape && <div className="box-tape"></div>}
             <div className="box-shading"></div>
