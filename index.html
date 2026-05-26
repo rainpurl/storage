@@ -150,16 +150,70 @@
       display: flex;
     }
 
-    /* ============ Box Grid ============ */
-    .shelf-section {
-      padding: 0 16px;
+    /* ============ Shelves ============ */
+    .shelves {
+      margin: 0 -16px;
+      padding-top: 24px;
     }
-
-    .grid {
+    .shelf {
+      position: relative;
+      margin-bottom: 28px;
+    }
+    .shelf-items {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px 14px;
-      padding-top: 8px;
+      gap: 16px;
+      padding: 0 18px;
+      align-items: end;
+      position: relative;
+      z-index: 2;
+    }
+    .shelf-spacer { visibility: hidden; }
+
+    /* The wooden shelf board */
+    .shelf-board {
+      height: 18px;
+      position: relative;
+      background:
+        linear-gradient(180deg,
+          #9c7045 0%,
+          #7d5733 35%,
+          #5d4022 75%,
+          #3d2814 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 220, 180, 0.22),
+        inset 0 -2px 0 rgba(0,0,0,0.4),
+        0 10px 14px -6px rgba(0,0,0,0.35),
+        0 3px 6px -2px rgba(0,0,0,0.18);
+    }
+    /* Subtle wood grain */
+    .shelf-board::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(180deg,
+          transparent 0,
+          rgba(0,0,0,0.05) 2px,
+          transparent 4px,
+          transparent 8px),
+        repeating-linear-gradient(90deg,
+          transparent 0,
+          rgba(255,255,255,0.025) 40px,
+          transparent 80px,
+          transparent 160px);
+      pointer-events: none;
+    }
+    /* Front lip — the thickness of the shelf */
+    .shelf-board::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      height: 5px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.22), transparent);
+      pointer-events: none;
     }
 
     /* A box that looks like cardboard */
@@ -177,15 +231,15 @@
       font-family: inherit;
       transition: transform 0.12s ease;
       box-shadow:
-        0 6px 0 -1px var(--shelf),
-        0 8px 10px -2px rgba(0,0,0,0.35),
-        0 1px 2px rgba(0,0,0,0.15);
+        0 10px 12px -6px rgba(0,0,0,0.42),
+        0 4px 6px -2px rgba(0,0,0,0.22),
+        inset 0 -3px 0 rgba(0,0,0,0.14);
     }
     .box:active {
       transform: translateY(2px);
       box-shadow:
-        0 3px 0 -1px var(--shelf),
-        0 4px 6px -2px rgba(0,0,0,0.35);
+        0 5px 8px -4px rgba(0,0,0,0.4),
+        0 2px 3px -1px rgba(0,0,0,0.2);
     }
 
     /* Top flap area */
@@ -955,13 +1009,6 @@
       from { opacity: 0; transform: translateY(-4px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    @media (min-width: 600px) {
-      .grid { grid-template-columns: 1fr 1fr 1fr; }
-    }
-    @media (min-width: 800px) {
-      .grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
-    }
   </style>
 </head>
 <body>
@@ -1408,31 +1455,46 @@
       const [showNewBox, setShowNewBox] = useState(false);
       const [confirmDelete, setConfirmDelete] = useState(null);
 
+      // Build the slot list: each box, then a "new" tile at the end if editing
+      const slots = boxes.map((b) => ({ kind: 'box', box: b }));
+      if (isEditMode) slots.push({ kind: 'new' });
+
+      // Chunk into rows of 2 for the shelves
+      const rows = [];
+      for (let i = 0; i < slots.length; i += 2) {
+        rows.push(slots.slice(i, i + 2));
+      }
+
       return (
         <>
-          <div className="shelf-section" style={{paddingTop: 24}}>
-            {boxes.length === 0 && !isEditMode ? (
-              <Empty />
-            ) : (
-              <div className="grid">
-                {boxes.map(box => (
-                  <BoxTile
-                    key={box.id}
-                    box={box}
-                    isEditMode={isEditMode}
-                    onClick={() => onSelectBox(box.id)}
-                    onDelete={() => setConfirmDelete(box)}
-                  />
-                ))}
-                {isEditMode && (
-                  <button className="new-box-tile" onClick={() => setShowNewBox(true)}>
-                    <Icon name="plus" size={28} />
-                    <span>New box</span>
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
+          {boxes.length === 0 && !isEditMode ? (
+            <Empty />
+          ) : (
+            <div className="shelves">
+              {rows.map((row, ri) => (
+                <div className="shelf" key={ri}>
+                  <div className="shelf-items">
+                    {row.map((slot, si) => slot.kind === 'box' ? (
+                      <BoxTile
+                        key={slot.box.id}
+                        box={slot.box}
+                        isEditMode={isEditMode}
+                        onClick={() => onSelectBox(slot.box.id)}
+                        onDelete={() => setConfirmDelete(slot.box)}
+                      />
+                    ) : (
+                      <button key="new" className="new-box-tile" onClick={() => setShowNewBox(true)}>
+                        <Icon name="plus" size={28} />
+                        <span>New box</span>
+                      </button>
+                    ))}
+                    {row.length === 1 && <div className="shelf-spacer" />}
+                  </div>
+                  <div className="shelf-board" aria-hidden="true"></div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {showNewBox && (
             <NewBoxModal
