@@ -236,129 +236,58 @@
       pointer-events: none;
     }
 
-    /* A box that looks like cardboard */
+    /* A box that looks like cardboard — wrapper for SVG + text */
     .box {
       display: block;
       width: 100%;
-      aspect-ratio: 1 / 1.08;
-      background:
-        var(--tex-cardboard) center / 220px 220px,
-        var(--box);
-      background-blend-mode: multiply;
-      border-radius: 3px 3px 4px 4px;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
+      aspect-ratio: 100 / 108;
+      background: transparent;
       border: none;
       padding: 0;
+      cursor: pointer;
       font-family: inherit;
-      transition: transform 0.12s ease;
-      box-shadow:
-        0 12px 14px -6px rgba(0,0,0,0.5),
-        0 5px 7px -2px rgba(0,0,0,0.28),
-        inset 0 -3px 0 rgba(0,0,0,0.18),
-        inset 0 1px 0 rgba(255,255,255,0.06);
+      position: relative;
+      filter:
+        drop-shadow(0 10px 10px rgba(0,0,0,0.32))
+        drop-shadow(0 4px 5px rgba(0,0,0,0.2));
+      transition: transform 0.12s ease, filter 0.12s ease;
     }
     .box:active {
       transform: translateY(2px);
-      box-shadow:
-        0 6px 8px -4px rgba(0,0,0,0.45),
-        0 2px 3px -1px rgba(0,0,0,0.2);
+      filter:
+        drop-shadow(0 5px 6px rgba(0,0,0,0.32))
+        drop-shadow(0 2px 3px rgba(0,0,0,0.2));
     }
-    /* Boxes with no cardboard pattern (clear plastic bins) */
-    .box[data-color="clear"] {
-      background: var(--box);
-    }
-    .box[data-color="clear"] .box-flap {
-      background: linear-gradient(180deg, var(--box-dark) 0%, var(--box) 100%);
-    }
-
-    /* Top flap area */
-    .box-flap {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 24%;
-      background:
-        var(--tex-cardboard) center / 220px 220px,
-        linear-gradient(180deg, var(--box-dark) 0%, var(--box) 100%);
-      background-blend-mode: multiply;
-      border-bottom: 1px solid rgba(0,0,0,0.35);
-      box-shadow: inset 0 -2px 4px rgba(0,0,0,0.18);
-    }
-    /* Vertical seam where the two flaps meet */
-    .box-flap::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      width: 0;
-      border-left: 1px solid rgba(0,0,0,0.45);
-      box-shadow: 1px 0 0 rgba(255,255,255,0.08);
-      transform: translateX(-0.5px);
-    }
-    /* Packing tape across the seam */
-    .box-tape {
-      position: absolute;
-      top: 9%;
-      left: -2%;
-      right: -2%;
-      height: 10%;
-      background: linear-gradient(180deg,
-        rgba(228, 208, 168, 0.7) 0%,
-        rgba(208, 188, 148, 0.78) 35%,
-        rgba(195, 175, 135, 0.78) 65%,
-        rgba(180, 160, 120, 0.7) 100%);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 245, 220, 0.55),
-        inset 0 -1px 0 rgba(70, 50, 25, 0.3),
-        0 1px 1px rgba(0,0,0,0.12);
-    }
-    /* Subtle shine highlight on tape */
-    .box-tape::after {
-      content: '';
-      position: absolute;
-      top: 25%;
-      bottom: 25%;
-      left: 0;
-      right: 0;
-      background: linear-gradient(180deg,
-        rgba(255,255,255,0.18) 0%,
-        rgba(255,255,255,0.04) 100%);
-      pointer-events: none;
-    }
-    /* Side shading & bottom edge — gives the box dimension */
-    .box-shading {
+    .box-svg {
       position: absolute;
       inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
       pointer-events: none;
-      box-shadow:
-        inset 6px 0 14px -4px rgba(0,0,0,0.18),
-        inset -6px 0 14px -4px rgba(0,0,0,0.18),
-        inset 0 -4px 0 var(--box-dark),
-        inset 0 -10px 14px -6px rgba(0,0,0,0.25);
-      border-radius: inherit;
     }
 
-    .box-content {
+    /* Text overlays on the FRONT FACE only (top 14% is the box top) */
+    .box-text {
       position: absolute;
-      top: 26%;
-      left: 0; right: 0;
+      top: 14%;
+      left: 0;
+      right: 0;
       bottom: 4%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 4% 6%;
+      padding: 4% 8%;
       text-align: center;
+      pointer-events: none;
     }
     .box-number {
       font-size: clamp(38px, 13vw, 60px);
       font-weight: 900;
-      color: var(--box-text, rgba(0,0,0,0.55));
+      color: var(--box-text, rgba(0,0,0,0.78));
       line-height: 0.9;
       letter-spacing: -0.04em;
-      font-feature-settings: "ss01";
       text-shadow: 0 1px 0 rgba(255,255,255,0.08);
     }
     .box-label {
@@ -377,7 +306,7 @@
     .box-count {
       font-size: 9px;
       font-weight: 600;
-      color: var(--box-text-soft, rgba(0,0,0,0.48));
+      color: var(--box-text-soft, rgba(0,0,0,0.55));
       margin-top: 6px;
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -1592,17 +1521,107 @@
     }
 
     // ============ Box Tile (cardboard box visual) ============
+    // ============ Box Graphic (SVG with real 3D form) ============
+    function BoxGraphic({ box, colors }) {
+      const c = colors;
+      const isClear = box.color === 'clear';
+      // unique-per-box seed for texture variation
+      const seed = (parseInt(box.id, 10) || 1) * 7 % 97 + 1;
+      const uid = 'b' + box.id;
+
+      return (
+        <svg
+          className="box-svg"
+          viewBox="0 0 100 108"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <filter id={`tex-${uid}`} x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.95 0.6" numOctaves="2" seed={seed} />
+              <feColorMatrix values="0 0 0 0 0.15  0 0 0 0 0.10  0 0 0 0 0.04  0 0 0 0.25 0" />
+              <feComposite in2="SourceGraphic" operator="in" />
+            </filter>
+            <linearGradient id={`top-${uid}`} x1="0.5" y1="0" x2="0.5" y2="1">
+              <stop offset="0%" stopColor={c.dark} />
+              <stop offset="100%" stopColor={c.light} />
+            </linearGradient>
+            <linearGradient id={`front-${uid}`} x1="0.5" y1="0" x2="0.5" y2="1">
+              <stop offset="0%" stopColor={c.light} />
+              <stop offset="14%" stopColor={c.main} />
+              <stop offset="100%" stopColor={c.dark} />
+            </linearGradient>
+            <linearGradient id={`tape-${uid}`} x1="0.5" y1="0" x2="0.5" y2="1">
+              <stop offset="0%" stopColor="rgb(238,222,188)" stopOpacity="0.7" />
+              <stop offset="50%" stopColor="rgb(218,200,165)" stopOpacity="0.78" />
+              <stop offset="100%" stopColor="rgb(195,178,140)" stopOpacity="0.72" />
+            </linearGradient>
+            <linearGradient id={`shineH-${uid}`} x1="0" y1="0.5" x2="1" y2="0.5">
+              <stop offset="0%" stopColor="white" stopOpacity="0" />
+              <stop offset="50%" stopColor="white" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="white" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+
+          {/* === TOP FACE (perspective trapezoid) === */}
+          <polygon points="12,0 88,0 100,15 0,15" fill={`url(#top-${uid})`} />
+          {!isClear && (
+            <polygon points="12,0 88,0 100,15 0,15" filter={`url(#tex-${uid})`} />
+          )}
+
+          {/* Packing tape running front-to-back across the top */}
+          {!isClear && (
+            <>
+              <polygon
+                points="44,0 56,0 61,15 39,15"
+                fill={`url(#tape-${uid})`}
+                stroke="rgba(120,95,55,0.35)"
+                strokeWidth="0.25"
+              />
+              {/* tape shine */}
+              <polygon
+                points="48,0 52,0 53.5,15 46.5,15"
+                fill="rgba(255,250,235,0.22)"
+              />
+            </>
+          )}
+
+          {/* Fold line between top and front face (shadow + tiny highlight) */}
+          <line x1="0" y1="15" x2="100" y2="15" stroke="rgba(0,0,0,0.42)" strokeWidth="0.6" />
+          <line x1="0" y1="14.4" x2="100" y2="14.4" stroke="rgba(255,235,200,0.18)" strokeWidth="0.3" />
+
+          {/* === FRONT FACE === */}
+          <rect x="0" y="15" width="100" height="93" fill={`url(#front-${uid})`} />
+          {!isClear && (
+            <rect x="0" y="15" width="100" height="93" filter={`url(#tex-${uid})`} />
+          )}
+
+          {/* Front face — left lit edge */}
+          <rect x="0" y="15" width="1.8" height="93" fill="rgba(255,255,255,0.10)" />
+          {/* Front face — right shadow edge */}
+          <rect x="95.5" y="15" width="4.5" height="93" fill="rgba(0,0,0,0.16)" />
+          {/* Front face — bottom contact shadow */}
+          <rect x="0" y="104" width="100" height="4" fill="rgba(0,0,0,0.22)" />
+
+          {/* Clear bins: vertical highlight stripe for plastic shine */}
+          {isClear && (
+            <>
+              <rect x="22" y="15" width="3" height="93" fill="rgba(255,255,255,0.35)" />
+              <rect x="76" y="15" width="2" height="93" fill="rgba(255,255,255,0.18)" />
+            </>
+          )}
+        </svg>
+      );
+    }
+
     function BoxTile({ box, isEditMode, onClick, onDelete }) {
       const c = getBoxColors(box);
       const style = boxStyleVars(c);
-      const showTape = box.color !== 'clear';
       return (
         <div style={{ position: 'relative' }}>
-          <button className="box" data-color={box.color} style={style} onClick={onClick}>
-            <div className="box-flap"></div>
-            {showTape && <div className="box-tape"></div>}
-            <div className="box-shading"></div>
-            <div className="box-content">
+          <button className="box" data-color={box.color} style={style} onClick={onClick} aria-label={`Box ${box.id}`}>
+            <BoxGraphic box={box} colors={c} />
+            <div className="box-text">
               <div className="box-number">{box.id}</div>
               {box.label && <div className="box-label">{box.label}</div>}
               {(box.items?.length || 0) > 0 && (
